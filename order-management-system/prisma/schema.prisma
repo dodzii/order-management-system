@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId    BigInt  @id @default(autoincrement())
+  name      String
+  address   String
+  email     String @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  carts     Cart[]
+  orders    Order[]
+}
+
+model Cart {
+  cartId    BigInt     @id @default(autoincrement())
+  userId    BigInt
+  user      User       @relation(fields: [userId], references: [userId])
+  cartItems CartItem[]
+  orders    Order[]
+}
+
+model CartItem {
+  cartId    BigInt
+  productId BigInt
+  quantity Int
+  cart      Cart    @relation(fields: [cartId], references: [cartId])
+  product   Product @relation(fields: [productId], references: [productId])
+
+  @@id([cartId, productId])
+}
+
+model Product {
+  productId   BigInt     @id @default(autoincrement())
+  name        String
+  description String
+  price       Decimal    @db.Decimal(10, 2)
+  stock       Int
+  cartItems   CartItem[]
+}
+
+model Order {
+  orderId   BigInt   @id @default(autoincrement())
+  orderDate DateTime @default(now())
+  status    String
+  userId    BigInt
+  cartId    BigInt
+  user      User     @relation(fields: [userId], references: [userId])
+  cart      Cart     @relation(fields: [cartId], references: [cartId])
+}
