@@ -12,12 +12,14 @@ const prisma_module_1 = require("./prisma/prisma.module");
 const cart_module_1 = require("./cart/cart.module");
 const core_1 = require("@nestjs/core");
 const BigIntInterceptor_1 = require("../BigIntInterceptor");
+const order_module_1 = require("./order/order.module");
+const user_module_1 = require("./user/user.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, cart_module_1.CartModule],
+        imports: [prisma_module_1.PrismaModule, cart_module_1.CartModule, order_module_1.OrderModule, user_module_1.UserModule],
         providers: [
             {
                 provide: core_1.APP_INTERCEPTOR,

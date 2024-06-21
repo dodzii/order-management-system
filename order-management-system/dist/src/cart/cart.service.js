@@ -34,7 +34,7 @@ let CartService = class CartService {
                         }
                     },
                     data: {
-                        quantity: currentQuantity + dto.quantity
+                        quantity: dto.quantity
                     }
                 });
             }
@@ -47,10 +47,34 @@ let CartService = class CartService {
                     }
                 });
             }
+            const cartItems = await this.prisma.cartItem.findMany({
+                where: {
+                    cartId: dto.cartId
+                },
+                include: {
+                    product: {
+                        select: {
+                            price: true
+                        }
+                    }
+                }
+            });
+            let total = 0;
+            cartItems.forEach(item => {
+                total += item.quantity * Number(item.product.price);
+            });
+            await this.prisma.cart.update({
+                where: {
+                    cartId: dto.cartId
+                },
+                data: {
+                    cartTotalPrice: total
+                }
+            });
             return 'Item added to cart successfully';
         }
         catch (e) {
-            return "Error adding item to cart";
+            return e.message;
         }
     }
     async getUserCart(userId) {
@@ -73,20 +97,7 @@ let CartService = class CartService {
                     },
                 },
             });
-            let total = 0;
-            let cart = [];
-            cartItems.cartItems.forEach(item => {
-                total += item.quantity * Number(item.product.price);
-                cart.push({
-                    name: item.product.name,
-                    quantity: item.quantity,
-                    price: item.product.price
-                });
-            });
-            return {
-                total,
-                cart
-            };
+            return cartItems;
         }
         catch (e) {
             return "Error fetching cart";
@@ -110,10 +121,35 @@ let CartService = class CartService {
                         }
                     },
                     data: {
-                        quantity: currentQuantity + dto.quantity
+                        quantity: dto.quantity
                     }
                 });
             }
+            const cartItems = await this.prisma.cartItem.findMany({
+                where: {
+                    cartId: dto.cartId
+                },
+                include: {
+                    product: {
+                        select: {
+                            price: true
+                        }
+                    }
+                }
+            });
+            let total = 0;
+            cartItems.forEach(item => {
+                total += item.quantity * Number(item.product.price);
+            });
+            await this.prisma.cart.update({
+                where: {
+                    cartId: dto.cartId
+                },
+                data: {
+                    cartTotalPrice: total
+                }
+            });
+            return 'Cart updated successfully';
         }
         catch (e) {
             return "Error updating cart";
@@ -127,6 +163,30 @@ let CartService = class CartService {
                         cartId: dto.cartId,
                         productId: dto.productId
                     }
+                }
+            });
+            const cartItems = await this.prisma.cartItem.findMany({
+                where: {
+                    cartId: dto.cartId
+                },
+                include: {
+                    product: {
+                        select: {
+                            price: true
+                        }
+                    }
+                }
+            });
+            let total = 0;
+            cartItems.forEach(item => {
+                total += item.quantity * Number(item.product.price);
+            });
+            await this.prisma.cart.update({
+                where: {
+                    cartId: dto.cartId
+                },
+                data: {
+                    cartTotalPrice: total
                 }
             });
             return "Item removed from cart";

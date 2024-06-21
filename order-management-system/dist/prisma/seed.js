@@ -14,6 +14,7 @@ async function main() {
     await prisma.cart.create({
         data: {
             userId: 1,
+            cartTotalPrice: 0,
         },
     });
     await prisma.product.create({
